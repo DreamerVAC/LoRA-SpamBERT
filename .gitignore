@@ -2,6 +2,10 @@
 bert/
 results/
 
+# Ignore data folder contents but keep the directory
+data/*
+!data/.gitkeep
+
 # Python
 __pycache__/
 *.py[cod]
@@ -40,7 +44,6 @@ ehthumbs.db
 Thumbs.db
 
 # Large data files
-data/enron_spam_data.csv
 *.h5
 *.ot
 *.onnx
