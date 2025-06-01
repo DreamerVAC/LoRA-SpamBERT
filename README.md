@@ -14,6 +14,39 @@
 | F1-score | 97.29% |
 | AUROC | 99.74% |
 
+## 快速开始
+
+如果你想直接使用我们预训练好的LoRA adapter进行垃圾邮件检测（已包含在仓库的`lora_model/lora-bert-adapter`目录中），只需：
+
+1. 下载BERT基础模型：
+```bash
+# 创建bert目录并下载模型
+mkdir -p bert && cd bert
+pip install modelscope
+modelscope download --model google-bert/bert-base-uncased --target_folder .
+cd ..
+```
+
+2. 运行评估：
+
+你可以用以下两种方式之一进行评估：
+
+a. 使用单个测试文件（每行格式：文本\t标签，标签为0表示正常邮件，1表示垃圾邮件）：
+```bash
+python lora_model/eval_classifier.py --test_file path/to/your/test.txt
+```
+
+b. 使用分开的正常邮件和垃圾邮件文件：
+```bash
+python lora_model/eval_classifier.py \
+    --test_ham path/to/your/ham.txt \
+    --test_spam path/to/your/spam.txt
+```
+
+评估结果将保存在 `results` 目录下：
+- `eval_output.txt`: 详细的评估日志
+- `accuracy_report.txt`: 包含准确率、精确率、召回率等指标的报告
+
 ## 项目结构
 
 ```

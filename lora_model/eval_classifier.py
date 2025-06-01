@@ -13,7 +13,7 @@ import re
 # ---------- 工具函数 ----------
 def load_texts(path):
     """
-    逐行读取文本；若行末是 “\\t0” 或 “\\t1”，自动去除标签，只保留正文。
+    逐行读取文本；若行末是 "0" 或 "1"，自动去除标签，只保留正文。
     跳过空行并返回文本列表。
     """
     texts = []
@@ -36,6 +36,14 @@ parser.add_argument("--model_dir", default="./bert",
                     help="Local directory of pretrained BERT files.")
 parser.add_argument("--offline", action="store_true",
                     help="Force transformers to work in offline mode (local files only).")
+parser.add_argument("--adapter_path", default="./lora_model/lora-bert-adapter",
+                    help="Path to the LoRA adapter directory.")
+parser.add_argument("--test_ham", default="./data/cleaned/test_ham.txt",
+                    help="Path to test ham file.")
+parser.add_argument("--test_spam", default="./data/cleaned/test_spam.txt",
+                    help="Path to test spam file.")
+parser.add_argument("--test_file", default=None,
+                    help="Path to a single test file with format: text\\tlabel.")
 args, extra = parser.parse_known_args()
 
 MODEL_PATH = args.model_dir if args.model_dir else "bert-base-uncased"
@@ -49,10 +57,10 @@ sys.stderr = sys.stdout
 
 # ---------- 路径 ----------
 MODEL_NAME = "bert-base-uncased"
-ADAPTER_DIR = "./lora_model/lora-bert-adapter"
+ADAPTER_DIR = args.adapter_path
 # paths to test ham/spam files
-HAM_FILE   = "./data/cleaned/test_ham.txt"
-SPAM_FILE  = "./data/cleaned/test_spam.txt"
+HAM_FILE = args.test_ham
+SPAM_FILE = args.test_spam
 
 # ---------- 加载模型 ----------
 print(">>> Loading base model")
@@ -86,29 +94,43 @@ def predict_spam_prob(sentence: str) -> float:
         spam_prob = probs[0][1].item()  # 第二个类别的概率（spam=1）
     return spam_prob
 
-# ---------- 评估数据集 ----------
-
 # ---------- 加载并评估 ----------
 records = []
 labels = []
 predictions = []
 
-ham_texts  = load_texts(HAM_FILE)
-spam_texts = load_texts(SPAM_FILE)
-print(f">>> Loaded ham={len(ham_texts)} spam={len(spam_texts)}")
+if args.test_file:
+    # 如果提供了单个测试文件
+    print(f">>> Loading test file: {args.test_file}")
+    with open(args.test_file, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            text, label = line.rsplit("\t", 1)
+            label = int(label)
+            spam_prob = predict_spam_prob(text)
+            records.append(["spam" if label else "ham", spam_prob, text])
+            labels.append(label)
+            predictions.append(spam_prob)
+else:
+    # 使用分开的ham和spam文件
+    ham_texts = load_texts(HAM_FILE)
+    spam_texts = load_texts(SPAM_FILE)
+    print(f">>> Loaded ham={len(ham_texts)} spam={len(spam_texts)}")
 
-print(">>> Evaluating test set")
-for text in tqdm(ham_texts, desc="Evaluating ham"):
-    spam_prob = predict_spam_prob(text)
-    records.append(["ham", spam_prob, text])
-    labels.append(0)
-    predictions.append(spam_prob)
+    print(">>> Evaluating test set")
+    for text in tqdm(ham_texts, desc="Evaluating ham"):
+        spam_prob = predict_spam_prob(text)
+        records.append(["ham", spam_prob, text])
+        labels.append(0)
+        predictions.append(spam_prob)
 
-for text in tqdm(spam_texts, desc="Evaluating spam"):
-    spam_prob = predict_spam_prob(text)
-    records.append(["spam", spam_prob, text])
-    labels.append(1)
-    predictions.append(spam_prob)
+    for text in tqdm(spam_texts, desc="Evaluating spam"):
+        spam_prob = predict_spam_prob(text)
+        records.append(["spam", spam_prob, text])
+        labels.append(1)
+        predictions.append(spam_prob)
 
 # ---------- 计算分类指标 ----------
 y_true = np.array(labels)
