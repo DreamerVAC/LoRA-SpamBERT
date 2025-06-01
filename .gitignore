@@ -37,4 +37,13 @@ wheels/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db 
+Thumbs.db
+
+# Large data files
+data/enron_spam_data.csv
+*.h5
+*.ot
+*.onnx
+*.bin
+*.safetensors
+*.msgpack 
