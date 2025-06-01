@@ -48,18 +48,32 @@ pip install -r requirements.txt
 ## 模型与数据准备
 
 ### BERT模型下载
-本项目使用的BERT模型来自ModelScope，在运行代码前需要先下载模型在./bert文件夹中：
+本项目使用的BERT模型来自ModelScope，在运行代码前需要先下载模型到 `bert` 目录：
 
 命令行下载：
-```
+```bash
+# 创建bert目录
+mkdir -p bert && cd bert
+
+# 下载模型
 pip install modelscope
-modelscope download --model google-bert/bert-base-uncased
+modelscope download --model google-bert/bert-base-uncased --target_folder .
+
+# 返回项目根目录
+cd ..
 ```
 
 git 下载：
-```
+```bash
+# 创建bert目录
+mkdir -p bert && cd bert
+
+# 下载模型
 git lfs install
-git clone https://www.modelscope.cn/google-bert/bert-base-uncased.git
+git clone https://www.modelscope.cn/google-bert/bert-base-uncased.git .
+
+# 返回项目根目录
+cd ..
 ```
 
 ### 数据集

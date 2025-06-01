@@ -1,6 +1,8 @@
-# Ignore bert and results folders
-bert/
-results/
+# Ignore bert and results folders contents but keep the directories
+bert/*
+!bert/.gitkeep
+results/*
+!results/.gitkeep
 
 # Ignore data folder contents but keep the directory
 data/*
