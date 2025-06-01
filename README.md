@@ -2,6 +2,18 @@
 
 本项目使用LoRA (Low-Rank Adaptation)技术对预训练BERT模型进行微调，实现高效的垃圾邮件检测系统。
 
+## 模型性能
+
+在Enron-Spam测试集上，BERT模型的表现如下：
+
+| 指标 | 性能 |
+|------|------|
+| Accuracy | 97.30% |
+| Precision | 98.66% |
+| Recall | 95.96% |
+| F1-score | 97.29% |
+| AUROC | 99.74% |
+
 ## 项目结构
 
 ```
@@ -36,10 +48,11 @@ pip install -r requirements.txt
 ## 模型与数据准备
 
 ### BERT模型下载
-本项目使用的BERT模型来自ModelScope，在运行代码前需要先下载模型：
+本项目使用的BERT模型来自ModelScope，在运行代码前需要先下载模型在./bert文件夹中：
 
 命令行下载：
 ```
+pip install modelscope
 modelscope download --model google-bert/bert-base-uncased
 ```
 
@@ -76,6 +89,8 @@ python lora_model/eval_classifier.py
 python lora_model/visualize_attention.py
 ```
 
+结果保存在./results文件夹中
+
 ## 主要特性
 
 - 使用LoRA技术进行高效模型微调
@@ -83,28 +98,3 @@ python lora_model/visualize_attention.py
 - 提供详细的模型评估指标
 - 包含注意力机制可视化工具
 - 实现多个基准模型用于对比
-
-## 注意事项
-
-1. 确保data/目录下已放置正确格式的邮件数据
-2. 训练前请检查GPU内存是否充足
-3. 可以通过修改配置文件调整模型参数
-4. BERT模型文件较大，不包含在代码仓库中，需要单独下载
-5. 首次运行时会自动下载BERT模型，请确保网络连接正常
-
-## 贡献指南
-
-欢迎提交Issue和Pull Request来帮助改进项目。在提交代码前，请确保：
-
-1. 代码风格符合项目规范
-2. 添加了必要的注释和文档
-3. 所有测试用例通过
-
-## 许可证
-
-本项目采用MIT许可证。详见LICENSE文件。
-
-## 致谢
-
-- BERT预训练模型由ModelScope提供
-- 感谢Enron-Spam数据集的提供者
